@@ -18,11 +18,12 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
+
     load();
   }, []);
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return <div style={{ padding: '16px' }}>Carregando...</div>;
   }
 
   if (error) {
@@ -43,12 +44,13 @@ export default function Dashboard() {
     );
   }
 
-  // aqui use os campos com fallback pra não quebrar se algo vier undefined
   const {
     total_revenue = 0,
     total_profit = 0,
     stock_cost = 0,
     stock_units = 0,
+    daily_revenue = 0,
+    daily_profit = 0,
   } = stats;
 
   return (
@@ -70,6 +72,14 @@ export default function Dashboard() {
         <div className="card">
           <h3>Unidades em estoque</h3>
           <p>{stock_units}</p>
+        </div>
+        <div className="card">
+          <h3>Faturamento do dia</h3>
+          <p>R$ {Number(daily_revenue).toFixed(2)}</p>
+        </div>
+        <div className="card">
+          <h3>Lucro do dia</h3>
+          <p>R$ {Number(daily_profit).toFixed(2)}</p>
         </div>
       </div>
     </div>
