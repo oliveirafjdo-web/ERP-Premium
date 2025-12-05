@@ -1,35 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { fetchJson } from '../api';
-import MetricCard from '../components/MetricCard';
-import StockTable from '../components/StockTable';
 
 export default function Dashboard() {
-  const [data, setData] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchJson('/api/dashboard').then(setData);
+    const load = async () => {
+      try {
+        const data = await fetchJson('/api/dashboard');
+        setStats(data);
+      } catch (err) {
+        console.error('Erro ao carregar dashboard:', err);
+        setError('Erro ao carregar informações do dashboard.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
-  if (!data) return <div>Carregando...</div>;
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
 
-  const c = data.cards;
+  if (error) {
+    return (
+      <div className="box">
+        <h2>Dashboard</h2>
+        <p style={{ color: '#f87171' }}>{error}</p>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="box">
+        <h2>Dashboard</h2>
+        <p>Nenhum dado disponível.</p>
+      </div>
+    );
+  }
+
+  // aqui use os campos com fallback pra não quebrar se algo vier undefined
+  const {
+    total_revenue = 0,
+    total_profit = 0,
+    stock_cost = 0,
+    stock_units = 0,
+  } = stats;
 
   return (
     <div>
       <h2>Dashboard</h2>
       <div className="grid">
-        <MetricCard title="Faturamento hoje" value={`R$ ${c.revenue_today.toFixed(2)}`} />
-        <MetricCard title="Faturamento mês" value={`R$ ${c.revenue_month.toFixed(2)}`} />
-        <MetricCard title="Lucro hoje" value={`R$ ${c.profit_today.toFixed(2)}`} />
-        <MetricCard title="Lucro mês" value={`R$ ${c.profit_month.toFixed(2)}`} />
-        <MetricCard title="Média diária 30d" value={c.avg_daily_30.toFixed(2)} />
-        <MetricCard title="Unidades em estoque" value={c.stock_total_units} />
-        <MetricCard title="Custo total estoque" value={`R$ ${c.stock_total_cost.toFixed(2)}`} />
-        <MetricCard title="Lucro potencial estoque" value={`R$ ${c.stock_potential_profit.toFixed(2)}`} />
+        <div className="card">
+          <h3>Faturamento total</h3>
+          <p>R$ {Number(total_revenue).toFixed(2)}</p>
+        </div>
+        <div className="card">
+          <h3>Lucro total</h3>
+          <p>R$ {Number(total_profit).toFixed(2)}</p>
+        </div>
+        <div className="card">
+          <h3>Custo do estoque</h3>
+          <p>R$ {Number(stock_cost).toFixed(2)}</p>
+        </div>
+        <div className="card">
+          <h3>Unidades em estoque</h3>
+          <p>{stock_units}</p>
+        </div>
       </div>
-
-      <h3>Estoque e Reposição</h3>
-      <StockTable items={data.stock} />
     </div>
   );
 }
