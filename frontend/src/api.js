@@ -3,7 +3,7 @@ export async function fetchJson(url, options = {}) {
     const res = await fetch(url, options);
 
     if (!res.ok) {
-      throw new Error(Erro HTTP ${res.status});
+      throw new Error('Erro HTTP ${res.status}');
     }
 
     return await res.json();
