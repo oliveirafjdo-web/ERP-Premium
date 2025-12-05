@@ -91,15 +91,15 @@ router.get('/list', async (req, res) => {
 
     if (date_from) {
       params.push(date_from);
-      conditions.push(s.sale_date >= $${params.length});
+      conditions.push('s.sale_date >= $' + params.length);
     }
     if (date_to) {
       params.push(date_to);
-      conditions.push(s.sale_date <= $${params.length});
+      conditions.push('s.sale_date <= $' + params.length);
     }
     if (source) {
       params.push(source);
-      conditions.push(s.source = $${params.length});
+      conditions.push('s.source = $' + params.length);
     }
 
     if (conditions.length) {
@@ -107,7 +107,7 @@ router.get('/list', async (req, res) => {
     }
 
     params.push(Number(limit));
-    query += ` ORDER BY s.sale_date DESC, s.created_at DESC LIMIT $${params.length}`;
+    query += ' ORDER BY s.sale_date DESC, s.created_at DESC LIMIT $' + params.length;
 
     const result = await db.query(query, params);
     res.json(result.rows);
@@ -141,14 +141,14 @@ router.get('/ml', async (req, res) => {
     const params = [];
     if (date_from) {
       params.push(date_from);
-      query += ` AND s.sale_date >= $${params.length}`;
+      query += ' AND s.sale_date >= $' + params.length;
     }
     if (date_to) {
       params.push(date_to);
-      query += ` AND s.sale_date <= $${params.length}`;
+      query += ' AND s.sale_date <= $' + params.length;
     }
     params.push(Number(limit));
-    query += ` ORDER BY s.sale_date DESC, s.created_at DESC LIMIT $${params.length}`;
+    query += ' ORDER BY s.sale_date DESC, s.created_at DESC LIMIT $' + params.length;
 
     const result = await db.query(query, params);
     res.json(result.rows);
